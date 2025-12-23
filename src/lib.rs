@@ -72,6 +72,7 @@
 pub mod circuit;
 /// The main qiskit-rs module
 mod qiskit;
+pub mod transpiler;
 
 pub use circuit::{ClassicalRegister, QuantumCircuit, QuantumRegister};
 pub use qiskit::*;

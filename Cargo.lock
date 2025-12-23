@@ -412,6 +412,7 @@ name = "qiskit"
 version = "0.0.0"
 dependencies = [
  "qiskit-sys",
+ "smallvec",
 ]
 
 [[package]]
