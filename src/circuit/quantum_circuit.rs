@@ -14,7 +14,7 @@ use std::ffi::CStr;
 
 use qiskit_sys::qk_circuit_gate;
 
-use crate::QiskitError;
+use crate::{QiskitError, circuit::operations::StandardGate};
 
 use super::registers::{ClassicalRegister, QuantumRegister};
 
@@ -287,6 +287,15 @@ impl QuantumCircuit {
             index: 0,
         }
     }
+
+    /// Add a standard gate to the circuit
+    /// 
+    /// # Arguments
+    /// 
+    /// `gate` : [StandardGate]
+    pub fn add_standard_gate(&mut self, gate: StandardGate, qubits: &[u32], params: &[f64]) -> QiskitError {
+        self.gate(gate as u8, qubits, params)
+    }
 }
 
 impl Drop for QuantumCircuit {
@@ -371,6 +380,8 @@ impl<'a> Iterator for CircuitInstructions<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::circuit::operations::StandardGate;
+
     use super::QuantumCircuit;
     use std::f64::consts::FRAC_PI_2;
 
@@ -410,6 +421,24 @@ mod tests {
                     assert_eq!(inst.clbits, &[]);
                 }
             }
+        }
+    }
+
+    #[test]
+    fn test_circuit_standard_gates() {
+        let mut qc: QuantumCircuit = QuantumCircuit::new(5, 0);
+        let operations: [StandardGate; 3] = [StandardGate::RZ, StandardGate::SX, StandardGate::RZ];
+        let mut qargs: [u32; 1] = [0,];
+        let parameters: [&[f64]; 3] = [&[FRAC_PI_2,], &[], &[FRAC_PI_2]];
+        for (index, gate) in operations.iter().enumerate(){
+            qc.add_standard_gate(*gate, &mut qargs, &parameters[index]);
+        }
+        for bit in 0..qc.num_qubits() {
+            qc.add_standard_gate(StandardGate::CX, &[0, bit], &[]);
+        }
+
+        for instruction in qc.instructions() {
+            println!("{:?}", instruction);
         }
     }
 }
